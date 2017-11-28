@@ -9,62 +9,81 @@ GAME RULES:
 
 */
 
-var scores, roundScores, activePlayer;
+var scores, roundScores, activePlayer, gamePlaying;
 
-scores = [0,0];
-roundScores = 0;
-activePlayer = 0;
-
-document.querySelector('.dice').style.display = 'none';
-
-document.getElementById('score-0').textContent = '0';
-document.getElementById('score-1').textContent = '0';
-document.getElementById('current-0').textContent = '0';
-document.getElementById('current-1').textContent = '0';
-
+init();
 
 document.querySelector('.btn-roll').addEventListener('click', function() {
-  // 1. roll a random number
-  var dice = Math.floor(Math.random() * 6) + 1;
+  if(gamePlaying) {
+    // 1. roll a random number
+    var dice = Math.floor(Math.random() * 6) + 1;
 
-  // 2. display result
-  var diceDOM = document.querySelector('.dice');
-  diceDOM.style.display = 'block';
-  diceDOM.src = 'dice-' + dice + '.png'; // changes the image
+    // 2. display result
+    var diceDOM = document.querySelector('.dice');
+    diceDOM.style.display = 'block';
+    diceDOM.src = 'dice-' + dice + '.png'; // changes the image
 
-  // 3. update round score IF the rolled number was NOT a 1
-  if (dice !== 1) {
-    //add score
-    roundScores += dice;
-    document.querySelector('#current-' + activePlayer).textContent = roundScores;
-  } else {
-    //next player
-    nextPlayer();
-
+    // 3. update round score IF the rolled number was NOT a 1
+    if (dice !== 1) {
+      //add score
+      roundScores += dice;
+      document.querySelector('#current-' + activePlayer).textContent = roundScores;
+    } else {
+      //next player
+      nextPlayer();
+    }
   }
 
 });
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
-  // add current score to global score
-  scores[activePlayer] += roundScores;
+  if (gamePlaying) {
+    // add current score to global score
+    scores[activePlayer] += roundScores;
 
-  // update the UI
-  document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+    // update the UI
+    document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
 
-  // check if player won the game
-  if (scores[activePlayer] >= 100) {
-    document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
-    document.querySelector('.dice').style.display = 'none';
-    document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
-    document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
-  } else {
-    // next player
-    nextPlayer();
+    // check if player won the game
+    if (scores[activePlayer] >= 20) {
+      document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
+      document.querySelector('.dice').style.display = 'none';
+      document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+      document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+      gamePlaying = false;
+    } else {
+      // next player
+      nextPlayer();
+    }
   }
 
-
 });
+
+document.querySelector('.btn-new').addEventListener('click', init);
+
+function init() {
+  scores = [0, 0];
+  activePlayer = 0;
+  roundScores = 0;
+  gamePlaying = true;
+
+  document.querySelector('.dice').style.display = 'none';
+
+  document.getElementById('score-0').textContent = '0';
+  document.getElementById('score-1').textContent = '0';
+  document.getElementById('current-0').textContent = '0';
+  document.getElementById('current-1').textContent = '0';
+  document.getElementById('name-0').textContent = 'Player 1';
+  document.getElementById('name-1').textContent = 'Player 2';
+  document.querySelector('.player-0-panel').classList.remove('winner');
+  document.querySelector('.player-1-panel').classList.remove('winner');
+  document.querySelector('.player-0-panel').classList.remove('active');
+  document.querySelector('.player-1-panel').classList.remove('active');
+  document.querySelector('.player-0-panel').classList.add('active');
+
+}
+
+
 
 
 function nextPlayer() {
